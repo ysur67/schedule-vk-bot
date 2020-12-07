@@ -32,42 +32,42 @@ class User:
         if self.message == "НАЧАТЬ" or self.message == "НАЗАД":
             keyboard_ = Keyboard(keyboard_type="COURSES")
             self.vk_api.send_message_keyboard(
-                message="Главное меню",
+                message = "Главное меню",
                 user_id = self.event.obj.message['from_id'],
                 keyboard = keyboard_.get_keyboard(),
                 )
         elif self.message == "ИЗМЕНИТЬРАСПИСАНИЕ":
             keyboard_ = Keyboard(keyboard_type="TIMETABLE")
             self.vk_api.send_message_keyboard(
-                user_id=self.user_id,
-                message="Выберите расписание",
-                keyboard=keyboard_.get_keyboard(),
+                user_id = self.user_id,
+                message = "Выберите расписание",
+                keyboard = keyboard_.get_keyboard(),
             )
         elif self.is_time_table(self.message):
             time_table_systemname = self.tabel.dialog_name_to_file_name(self.message)
             _ = TimeTable.objects.get_or_create(
-                name=time_table_systemname,
-                date=self.tabel.date_from_systemname(time_table_systemname),  
+                name = time_table_systemname,
+                date = self.tabel.date_from_systemname(time_table_systemname),  
             )
             Person.objects.filter(id=self.user_id).update(time_table=str(_[0].pk))
             # I don't know why should I get id from tuple like I did it above
             # but it works just fine :)
             keyboard_ = Keyboard(keyboard_type="BEGIN")
             self.vk_api.send_message_keyboard(
-                user_id=self.user_id,
-                message="Ваше расписание обновлено",
-                keyboard=keyboard_.get_keyboard(),
+                user_id = self.user_id,
+                message = "Ваше расписание обновлено",
+                keyboard = keyboard_.get_keyboard(),
             )
         elif self.is_course(self.message):
             keyboard_ = Keyboard(keyboard_type="GROUPS", message=self.message)
             self.vk_api.send_message_keyboard(
-                user_id=self.user_id,
-                message="Выберите группу",
-                keyboard= keyboard_.get_keyboard(),
+                user_id = self.user_id,
+                message = "Выберите группу",
+                keyboard = keyboard_.get_keyboard(),
             )
         elif self.is_group_name(self.message):
             p = Person.objects.get(
-                id=self.user_id
+                id = self.user_id
             )
             tabel_name = str(p.time_table.name)
             chosen_table = Table(tabel_name)
@@ -75,33 +75,33 @@ class User:
             lessons_for_dialog = chosen_table.getProperLessons(lessons)
             group_name = self.message
             self.vk_api.send_message(
-                user_id=self.user_id,
-                message=tabel_name + "\n" 
+                user_id = self.user_id,
+                message = tabel_name + "\n" 
                     + "Группа: " + group_name + 
                     "\n" + lessons_for_dialog,
             )
         elif self.message == "НАСТРОЙКАУВЕДОМЛЕНИЙ":
             keyboard_ = Keyboard(keyboard_type="SETTINGS")
             self.vk_api.send_message_keyboard(
-                user_id=self.user_id,
-                message="Если хотите отменить, нажмите 'Назад'",
+                user_id = self.user_id,
+                message = "Если хотите отменить, нажмите 'Назад'",
                 keyboard = keyboard_.get_keyboard()
             )
         elif self.message == "НЕПОЛУЧАТЬУВЕДОМЛЕНИЙ":
             keyboard_ = Keyboard(keyboard_type="BEGIN")
             Person.objects.filter(id=self.user_id).update(send_notifications=False)
             self.vk_api.send_message_keyboard(
-                user_id=self.user_id,
-                message="Вы больше не будете получать уведомлений",
-                keyboard=keyboard_.get_keyboard(),
+                user_id = self.user_id,
+                message = "Вы больше не будете получать уведомлений",
+                keyboard = keyboard_.get_keyboard(),
             )
         elif self.message == "ПОЛУЧАТЬУВЕДОМЛЕНИЯ":
             keyboard_ = Keyboard(keyboard_type="BEGIN")
             Person.objects.filter(id=self.user_id).update(send_notifications=True)
             self.vk_api.send_message_keyboard(
-                user_id=self.user_id,
-                message="Теперь вы будете получать уведомления",
-                keyboard=keyboard_.get_keyboard(),
+                user_id = self.user_id,
+                message = "Теперь вы будете получать уведомления",
+                keyboard = keyboard_.get_keyboard(),
             )
         elif self.message == "ОБНОВИТЬ":
             #p = Parser()
@@ -112,27 +112,27 @@ class User:
             # on site 
             if f:
                 self.vk_api.send_message(
-                    user_id=self.user_id,
-                    message="Найдено новое расписание, обновляю..."
+                    user_id = self.user_id,
+                    message = "Найдено новое расписание, обновляю..."
                 )
                 _ = Person.objects.filter(send_notifications=True)
                 for person in _:
                     self.vk_api.send_message(
-                        user_id=person.pk,
-                        message="Появилось новое расписание"
+                        user_id = person.pk,
+                        message = "Появилось новое расписание"
                     )
             else:
                 self.vk_api.send_message(
-                    user_id=self.user_id,
-                    message="Нового расписания не найдено, отмена..."
+                    user_id = self.user_id,
+                    message = "Нового расписания не найдено, отмена..."
                 )
         else:
             keyboard_ = Keyboard(keyboard_type="BEGIN")
             self.vk_api.send_message_keyboard(
-                user_id=self.user_id,
-                message='Я вас не понимаю\nПожалуйста, пользуйтесь кнопками\n'+
+                user_id = self.user_id,
+                message = 'Я вас не понимаю\nПожалуйста, пользуйтесь кнопками\n'+
                     'Что бы продолжить нажмите "Начать"',
-                keyboard=keyboard_.get_keyboard(),
+                keyboard = keyboard_.get_keyboard(),
             )
 
     def is_time_table(self, message):
