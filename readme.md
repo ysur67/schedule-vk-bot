@@ -1,7 +1,7 @@
 # VK Bot
-Simple bot made on Python<br/>;
-Based on Django<br/>;
-Using longpolling<br/>;
+Simple bot made on Python<br/>
+Based on Django<br/>
+Using longpolling<br/>
 
 # Known issues
 ### When there are more or lesser than 2 files of timetables it's breaking<br/>
