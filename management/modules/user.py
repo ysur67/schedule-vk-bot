@@ -8,31 +8,43 @@ from vk_api.utils import get_random_id
 from .vk import API
 from .Table import Table
 from .Parser import Parser
+from .keyboard import Keyboard
 from ...models import TimeTable, Person
 
 class User:
     def __init__(self, event_):
         self.event = event_
         self.user_id = self.event.obj.message['from_id']
-        self.random_id = get_random_id()
         self.message = self.event.obj.message['text'].upper().replace(" ", "")
         self.vk_api = API()
+        self.name = self.vk_api.vk.users.get(user_id=self.user_id)[0].get('first_name')
         self.tabel = Table()
         self.time_table = TimeTable.objects.get_or_create(
             name = self.tabel.currentFile,
             date = self.tabel.current_file_date,
         )
-        self.person = Person.objects.get_or_create(
+        self.person, self.made_now = Person.objects.get_or_create(
             id = self.user_id,
-            time_table=TimeTable.objects.filter(
-                id=self.time_table[0].pk
-            ).get(),
+            defaults = {
+                'time_table':TimeTable.objects.filter(
+                    id=self.time_table[0].pk
+                ).get(),
+            }
         )
         self.local_time_tables = self.tabel.proper_names_for_dialog
         self.what_in_message()
 
     def what_in_message(self):
-        if self.message == "НАЧАТЬ" or self.message == "НАЗАД":
+        if self.made_now == True:
+            keyboard_ = Keyboard(keyboard_type="COURSES")
+            self.vk_api.send_message_keyboard(
+                user_id=self.user_id,
+                message=f"Добро пожаловать, {self.name}\n"+
+                    "Вам было установлено последнeе расписание\n"+
+                    'Если хотите изменить, нажмите "Изменить расписание"',
+                keyboard=keyboard_.get_keyboard(),
+            )
+        elif self.message == "НАЧАТЬ" or self.message == "НАЗАД":
             keyboard_ = Keyboard(keyboard_type="COURSES")
             self.vk_api.send_message_keyboard(
                 message = "Главное меню",
