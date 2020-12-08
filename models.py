@@ -11,7 +11,8 @@ class TimeTable(models.Model):
 
     name = models.CharField(
         max_length=100,
-        help_text="Name of timetable"
+        help_text="Name of timetable",
+        unique=False
     )
 
     date = models.DateField(
@@ -27,7 +28,12 @@ class Person(models.Model):
         help_text = "User ID from VK"
     )
 
-    time_table = models.ForeignKey('TimeTable', on_delete=models.SET_NULL, null=True)
+    time_table = models.ForeignKey('TimeTable',
+    on_delete=models.SET_NULL,
+    null=True,
+    unique=False,
+    )
+    
 
     send_notifications = models.BooleanField(default=False)
     

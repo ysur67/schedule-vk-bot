@@ -1,7 +1,10 @@
+management/commands/__pycache__
+management/modules/__pycache__
+management/files
 /migrations
 /__pycache__
 apps.py
 __init__.py
 tests.py
 views.py
-
+.vscode
