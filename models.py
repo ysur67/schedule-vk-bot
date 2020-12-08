@@ -27,13 +27,19 @@ class Person(models.Model):
         primary_key = True,
         help_text = "User ID from VK"
     )
-
-    time_table = models.ForeignKey('TimeTable',
-    on_delete=models.SET_NULL,
-    null=True,
-    unique=False,
-    )
     
+    name = models.CharField(
+        max_length=100,
+        help_text="User name, should be taken from VK",
+        default="No Data",
+    )
+
+    time_table = models.ForeignKey(
+        'TimeTable',
+        on_delete=models.SET_NULL,
+        null=True,
+        unique=False,
+        )  
 
     send_notifications = models.BooleanField(default=False)
     

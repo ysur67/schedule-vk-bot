@@ -7,4 +7,4 @@ class TimeTableAdmin(admin.ModelAdmin):
 
 @admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):
-    list_display = ('id', 'time_table', 'send_notifications')
+    list_display = ('name', 'time_table', 'send_notifications')

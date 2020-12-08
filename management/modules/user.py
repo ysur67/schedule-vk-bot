@@ -26,6 +26,7 @@ class User:
         self.person, self.made_now = Person.objects.get_or_create(
             id = self.user_id,
             defaults = {
+                'name':self.name,
                 'time_table':TimeTable.objects.filter(
                     id=self.time_table[0].pk
                 ).get(),

@@ -45,9 +45,3 @@ class FileManager:
         info = "Object contains {0} file(s)\n".format(self.__amountOfFiles,)
         info += "Directory contains {0} local file(s)".format(len(self.__localFileNames))
         return info   
-
-
-if __name__ == "__main__":
-    man = FileManager("Расписание очное отделение 23.11.20-27.11.20",
-        "Расписание очное отделение 30.11.20-04.12.20",)
-    print(man.table_names_for_dialog)
