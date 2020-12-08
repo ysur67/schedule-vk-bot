@@ -65,10 +65,10 @@ class User:
                 name = time_table_systemname,
                 date = self.tabel.date_from_systemname(time_table_systemname),  
             )
-            Person.objects.filter(id=self.user_id).update(time_table=str(_[0].pk))
+            Person.objects.filter(id=self.user_id).update(time_table=_[0].pk)
             # I don't know why should I get id from tuple like I did it above
             # but it works just fine :)
-            keyboard_ = Keyboard(keyboard_type="BEGIN")
+            keyboard_ = Keyboard(keyboard_type="COURSES")
             self.vk_api.send_message_keyboard(
                 user_id = self.user_id,
                 message = "Ваше расписание обновлено",
@@ -86,7 +86,8 @@ class User:
                 id = self.user_id
             )
             tabel_name = self.tabel.dialog_file_name(p.time_table.name)
-            chosen_table = Table(tabel_name)
+            system_name = self.tabel.dialog_name_to_file_name(tabel_name)
+            chosen_table = Table(system_name)
             lessons = chosen_table.groupLessons(self.message)
             lessons_for_dialog = chosen_table.getProperLessons(lessons)
             group_name = self.message
