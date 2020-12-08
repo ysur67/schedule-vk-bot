@@ -87,6 +87,9 @@ class Table:
 
     def groupNamesByCourse(self, *range_):
         return self.__tableManager.get_group_names(*range_)
+
+    def dialog_file_name(self, name):
+        return self.__fileManager.get_proper_name(name)
     
     def dialog_name_to_file_name(self, dialog_name):
         date = self.__dateManager.get_date_from_dialog_name(dialog_name)

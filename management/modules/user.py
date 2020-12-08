@@ -85,7 +85,7 @@ class User:
             p = Person.objects.get(
                 id = self.user_id
             )
-            tabel_name = str(p.time_table.name)
+            tabel_name = self.tabel.dialog_file_name(p.time_table.name)
             chosen_table = Table(tabel_name)
             lessons = chosen_table.groupLessons(self.message)
             lessons_for_dialog = chosen_table.getProperLessons(lessons)
