@@ -35,5 +35,3 @@ class API:
 
     def is_new_message(self, event):
         return True if event.type == VkBotEventType.MESSAGE_NEW else False
-    
-    

@@ -144,9 +144,3 @@ class Table:
     def __str__(self):
         amount_of_groups = len(self.__groupNames)
         return f"Groups {amount_of_groups}"# change it
-
-if __name__ == "__main__": 
-    t = Table()
-    msg = 'ИС-44И-33'
-    #print(t.groupLessons(groupName='ИС-44И-33'))
-    print(t.getProperLessons(t.groupLessons(msg)))

@@ -57,11 +57,3 @@ class DateManager:
         info += "All the files you've given and their dates: \n"
         info += str(self.__dates)
         return info
-        
-if __name__ == "__main__":
-    date = DateManager("Расписание очное отделение 01.12.20-27.11.20", 
-        "Расписание очное отделение 30.11.20-04.12.20",)
-    # print(date.dates)
-    # print(date.latestFile)
-    # print(date.latestFileDate)
-    print(date.get_date_from_dialog_name("Расписание 30.11.20-04.12.20"))

@@ -91,7 +91,3 @@ class Parser:
         info += "Earliest file in directory '{}'\n".format(self.__dateManager.earliestFile)
         info += "Latest file in directory '{}'\n".format(self.__dateManager.latestFile)
         return info
-
-if __name__ == "__main__": 
-    p = Parser()
-    print(p)
