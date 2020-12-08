@@ -4,7 +4,4 @@ apps.py
 __init__.py
 tests.py
 views.py
-/managment/files/
-/modules/__pycache__
-/modules/botExceptions
-/modules/ss.py
+

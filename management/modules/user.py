@@ -24,6 +24,9 @@ class User:
         )
         self.person = Person.objects.get_or_create(
             id = self.user_id,
+            time_table=TimeTable.objects.filter(
+                id=self.time_table[0].pk
+            ).get(),
         )
         self.local_time_tables = self.tabel.proper_names_for_dialog
         self.what_in_message()
