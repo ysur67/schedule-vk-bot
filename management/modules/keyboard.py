@@ -5,9 +5,8 @@ from vk_api.keyboard import VkKeyboard, VkKeyboardColor
 class Keyboard:
     settings = dict(one_time=False, inline=False)
 
-    table_manager = Table()
-
     def __init__(self, keyboard_type, message=""):
+        self.table_manager = Table()
         if keyboard_type == "BEGIN":
             self.keyboard = self.Begin_Keyboard()
         elif keyboard_type == "COURSES":
