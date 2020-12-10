@@ -44,11 +44,6 @@ class Parser:
 
         open(self.__filePath, 'wb').write(self.__downloadRequest.content)
 
-        self.__hasMoreThanTwoFiles = self.__checkForThirdFile()
-
-        if(self.__hasMoreThanTwoFiles):
-            self.__removeEarliest()
-
     def __getURL(self):
         try:
             link = requests.get(self.__url, self.__headers)
@@ -73,13 +68,14 @@ class Parser:
         return proper_files
 
     def __getLinks(self):
-        return dict(zip(self.__file_manager.filesNames, self.__hrefList[0:2]))
+        if len(self.__file_manager.filesNames)<3:
+            return dict(zip(self.__file_manager.filesNames, self.__hrefList[0:2]))
+        else:
+            return dict(zip(self.__file_manager.filesNames, self.__hrefList[0:3]))
+
 
     def __getCurrentFileName(self):
         return self.__dateManager.latestFile
-
-    def __checkForThirdFile(self):
-        return True if len(self.__file_manager.localFilesNames)>2 else False
 
     def __removeEarliest(self):
         locFileManager = FileManager()
