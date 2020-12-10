@@ -1,4 +1,5 @@
 import os
+import re
 
 class FileManager:
     def __init__(self, *files):
@@ -34,14 +35,24 @@ class FileManager:
     def table_names_for_dialog(self):
         dialog_names = []
         for name in self.__localFileNames:
-            dialog_names.append(str(name[0:10] + " " + name[27:]).upper().replace(" ", ""))
+            dialog_names.append(self.pop_extra_info(name).replace('  ', ''))
         return dialog_names
 
     def get_proper_name(self, name):
-        return name[:10] + " " + name[27:] 
+        return self.pop_extra_info(name)
 
+    def pop_extra_info(self, name):
+        return re.sub(r'очное отделение', ' ', name).replace('  ', '')
 
     def __str__(self):
         info = "Object contains {0} file(s)\n".format(self.__amountOfFiles,)
         info += "Directory contains {0} local file(s)".format(len(self.__localFileNames))
         return info   
+
+if __name__ == "__main__":
+    file_man = FileManager(
+        "Расписание очное отделение 01.12.20-27.11.20", 
+        "Расписание очное отделение 30.11.20-04.12.20",
+    )
+    print(file_man.table_names_for_dialog)
+
