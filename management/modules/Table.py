@@ -92,11 +92,11 @@ class Table:
         return self.__fileManager.get_proper_name(name)
     
     def dialog_name_to_file_name(self, dialog_name):
-        date = self.__dateManager.get_date_from_dialog_name(dialog_name)
+        date = self.__dateManager.get_date_from_name(dialog_name)
         return self.__dates.get(date) 
 
     def date_from_systemname(self, name):
-        return self.__dateManager.get_date_from_systemname(name)
+        return self.__dateManager.get_date_from_name(name)
 
     def getProperLessons(self, lessons):
         i = 0

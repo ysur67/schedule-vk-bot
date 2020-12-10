@@ -1,9 +1,10 @@
 import requests
 from bs4 import BeautifulSoup
 import os
-from .botExceptions import ModuleException
-from .FileNamesManager import FileManager
-from .FilesDateManager import DateManager
+import re
+from botExceptions import ModuleException
+from FileNamesManager import FileManager
+from FilesDateManager import DateManager
 
 class Parser:
     def __init__(self):
@@ -20,21 +21,26 @@ class Parser:
         self.__hrefList = self.__getFileHrefs()
 
         self.__fileNames = self.__getFileNames()
+        
+        self.time_tables_names = self.Time_Tables(*self.__fileNames)
 
-        self.__fileManager = FileManager(self.__fileNames[0], self.__fileNames[1])
+        #self.__fileManager = FileManager(self.__fileNames[0], self.__fileNames[1])
+        self.__file_manager = FileManager(*self.time_tables_names)
 
-        self.__dateManager = DateManager(*self.__fileManager.filesNames)
+        self.__dateManager = DateManager(*self.__file_manager.filesNames)
         
         self.__currentTimeTableName = self.__dateManager.latestFile + ".xlsx"
 
         self.__linkToTables = self.__getLinks()
 
-        self.__directory = self.__fileManager.filesPath
+        self.__directory = self.__file_manager.filesPath
 
         self.__filePath = os.path.join(self.__directory, self.__currentTimeTableName)
 
-        self.__downloadRequest = requests.get(self.__linkToTables.get(
-            self.__dateManager.latestFile), allow_redirects=True)
+        self.__downloadRequest = requests.get(
+            self.__linkToTables.get(self.__dateManager.latestFile),
+            allow_redirects=True,
+            )
 
         open(self.__filePath, 'wb').write(self.__downloadRequest.content)
 
@@ -60,14 +66,20 @@ class Parser:
         fileNames = [span.find('a').text for span in self.__tags]
         return fileNames
 
+    def Time_Tables(self, *file_names):
+        proper_files = []
+        is_time_table = lambda name: proper_files.append(name) if " очное" in name else None
+        [is_time_table(name) for name in file_names]
+        return proper_files
+
     def __getLinks(self):
-        return dict(zip(self.__fileManager.filesNames, self.__hrefList[0:2]))
+        return dict(zip(self.__file_manager.filesNames, self.__hrefList[0:2]))
 
     def __getCurrentFileName(self):
         return self.__dateManager.latestFile
 
     def __checkForThirdFile(self):
-        return True if len(self.__fileManager.localFilesNames)>2 else False
+        return True if len(self.__file_manager.localFilesNames)>2 else False
 
     def __removeEarliest(self):
         locFileManager = FileManager()
@@ -91,3 +103,7 @@ class Parser:
         info += "Earliest file in directory '{}'\n".format(self.__dateManager.earliestFile)
         info += "Latest file in directory '{}'\n".format(self.__dateManager.latestFile)
         return info
+
+if __name__ == "__main__":
+    par = Parser()
+    print(par.time_tables_names)

@@ -1,5 +1,6 @@
 management/commands/__pycache__
 management/modules/__pycache__
+management/modules/test.py
 management/files
 /migrations
 /__pycache__

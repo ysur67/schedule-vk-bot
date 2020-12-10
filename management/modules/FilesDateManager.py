@@ -1,35 +1,34 @@
 from datetime import datetime
+import re
 
 class DateManager:
     def __init__(self, *filesNames):
-        self.__amountOfFiles = filesNames.__len__()
+        #self.__amountOfFiles = filesNames.__len__()
         self.__filesNames = filesNames
-        self.__dates = self.__fillList()
+        self.__dates = self.__all_dates()
         self.__earliestFile = self.__dates.get(self.__getEarliestDate(self.__dates))
         self.__latestFile = self.__dates.get(self.__getLatestDate(self.__dates))
     
-    def __fillList(self):
-        filesDates = {}
+    def __all_dates(self):
+        files_dates = {}
         for name in self.__filesNames:
-            date = self.__getDateFromName(name)
-            filesDates[date] = name
-        return filesDates
+            date = self.get_date_from_name(name)
+            files_dates[date] = name
+        return files_dates
 
-    def __getDateFromName(self, fileName):
-        date = datetime.strptime(fileName[27:35], "%d.%m.%y")
-        return date
+    def get_date_from_name(self, fileName):
+        get_date = lambda date: datetime.strptime(date, "%d.%m.%y")
+        string_dates = re.findall(r'\d{2}.\d{2}.\d{2}', fileName)
+        proper_dates = [get_date(date) for date in string_dates]
+        return min(proper_dates)
+        # I will always use first date from names
+        # so it means, that it is the first one
 
     def __getEarliestDate(self, dates):
         return min(dates)
     
     def __getLatestDate(self, dates):
-        return max(dates)
-
-    def get_date_from_dialog_name(self, name):
-        return datetime.strptime(name.replace(" ","")[10:18], "%d.%m.%y")
-
-    def get_date_from_systemname(self, name):
-        return self.__getDateFromName(name)
+        return max(dates)        
 
     @property
     def earliestFile(self):
@@ -57,3 +56,12 @@ class DateManager:
         info += "All the files you've given and their dates: \n"
         info += str(self.__dates)
         return info
+
+if __name__ == "__main__":
+    date = DateManager(
+        "Расписание очное отделение 01.12.20-27.11.20", 
+        "Расписание очное отделение 30.11.20-04.12.20",
+        )
+    #print(date.File)
+    print(date)
+    print(date.get_date_from_dialog_name('Расписание 30.11.20-04.12.20'))
