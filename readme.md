@@ -16,4 +16,4 @@ Actually, I don't even know is it really needed. Anyway, somehow and someday I w
 The video below isn't the last version of bot, so any changes can be made
 ![alt text][gif_file]
 
-<img src="https://github.com/ysur67/schedule-vk-bot/blob/main/management/video/timetable.gif" width="40" height="100" />
+<img src="https://github.com/ysur67/schedule-vk-bot/blob/main/management/video/timetable.gif"/>
