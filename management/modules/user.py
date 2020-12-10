@@ -10,8 +10,10 @@ from .Table import Table
 from .Parser import Parser
 from .keyboard import Keyboard
 from ...models import TimeTable, Person
+import re
 
 class User:
+    admin = 74363077
     def __init__(self, event_):
         self.event = event_
         self.user_id = self.event.obj.message['from_id']
@@ -90,7 +92,7 @@ class User:
             else:
                 tabel_name = self.tabel.dialog_file_name(self.tabel.currentFile)
                 self.vk_api.send_message(
-                    message="Ваш выбор расписания устарел!\n"+
+                    message="Ваш выбор расписания устарел, оно было удалено\n"+
                         "В данный момент вам будет выбрано последнее расписание\n"+
                         "Не забудьте его поменять!",
                     user_id=self.user_id,
@@ -135,22 +137,45 @@ class User:
             #if p.isNewFileLoaded:
             # Parser works fine
             # but there are no timetables
-            # on site 
-            if f:
-                self.vk_api.send_message(
-                    user_id = self.user_id,
-                    message = "Найдено новое расписание, обновляю..."
-                )
-                _ = Person.objects.filter(send_notifications=True)
-                for person in _:
+            # on site
+            if self.user_id == self.admin:
+                if f:
                     self.vk_api.send_message(
-                        user_id = person.pk,
-                        message = "Появилось новое расписание"
+                        user_id = self.user_id,
+                        message = "Найдено новое расписание, обновляю..."
+                    )
+                    _ = Person.objects.filter(send_notifications=True)
+                    for person in _:
+                        self.vk_api.send_message(
+                            user_id = person.pk,
+                            message = "Появилось новое расписание"
+                        )
+                else:
+                    self.vk_api.send_message(
+                        user_id = self.user_id,
+                        message = "Нового расписания не найдено, отмена..."
                     )
             else:
                 self.vk_api.send_message(
-                    user_id = self.user_id,
-                    message = "Нового расписания не найдено, отмена..."
+                    user_id  =self.user_id,
+                    message = "Вы не являетесь админом",
+                )
+        elif self.message == "УДАЛИТЬ":
+            if self.user_id == self.admin:
+                keyboard_ = Keyboard(keyboard_type="ADMIN")
+                self.vk_api.send_message_keyboard(
+                    user_id = self.admin,
+                    message = "Выберите, какое расписание удалить",
+                    keyboard = keyboard_.get_keyboard(),
+                )
+        elif "АДМИН" in self.message:
+            if self.user_id == self.admin:
+                msg = re.sub(r'админ', "", self.message)
+                msg = self.tabel.dialog_name_to_file_name(msg)
+                self.tabel.pop_file(msg)
+                self.vk_api.send_message(
+                    user_id=self.admin,
+                    message="done",
                 )
         else:
             keyboard_ = Keyboard(keyboard_type="BEGIN")

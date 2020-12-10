@@ -17,6 +17,8 @@ class Keyboard:
             self.keyboard = self.TimeTable_Keyboard()
         elif keyboard_type == "SETTINGS":
             self.keyboard = self.Settings_Keyboard()
+        elif keyboard_type == "ADMIN":
+            self.keyboard = self.Admin_Keyboard()
     
     def Begin_Keyboard(self):
         keyboard = VkKeyboard(**self.settings)
@@ -87,6 +89,20 @@ class Keyboard:
             )
         keyboard_.add_line()
         keyboard_.add_button(label="Назад", color=VkKeyboardColor.SECONDARY)
+        return keyboard_
+
+    def Admin_Keyboard(self):
+        keyboard_ = VkKeyboard(**self.settings)
+        time_tables = []
+        i = 0
+        dates = self.table_manager.dates
+        for key in dates:
+            time_tables.append(self.__proper_text_for_button(str(key)))
+        while i < len(time_tables):
+            keyboard_.add_button(time_tables[i]+" админ")
+            keyboard_.add_line()
+            i+=1
+        keyboard_.add_button(label="Назад", color=VkKeyboardColor.PRIMARY)
         return keyboard_
 
     def get_keyboard(self):
