@@ -83,10 +83,6 @@ class Parser:
         os.remove(str(self.__directory+'\\'+locDatesManager.earliestFile+".xlsx"))
 
     @property
-    def isNewFileLoaded(self):
-        return True if self.__hasMoreThanTwoFiles else False
-
-    @property
     def latestFile(self):
         return self.__dateManager.latestFile
 
@@ -95,8 +91,7 @@ class Parser:
         return self.__dateManager.earliestFile
 
     def __str__(self):
-        info = "The module has uploaded a new file = {0}\n".format(self.__hasMoreThanTwoFiles)
-        info += "Earliest file in directory '{}'\n".format(self.__dateManager.earliestFile)
+        info = "Earliest file in directory '{}'\n".format(self.__dateManager.earliestFile)
         info += "Latest file in directory '{}'\n".format(self.__dateManager.latestFile)
         return info
 
