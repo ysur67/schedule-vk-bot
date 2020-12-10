@@ -14,3 +14,6 @@ It will be soon, so you will be able to check how it works
 Actually, I don't even know is it really needed. Anyway, somehow and someday I will add it, but I don't know when
 # How bot works for now<br/>
 The video below isn't the last version of bot, so any changes can be made
+![alt text][gif_file]
+
+[gif_file]: https://github.com/ysur67/schedule-vk-bot/blob/main/management/video/timetable.gif "gif_file"
