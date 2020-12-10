@@ -22,7 +22,7 @@ class DateManager:
         proper_dates = [get_date(date) for date in string_dates]
         return min(proper_dates)
         # I will always use first date from names
-        # so it means, that it is the first one
+        # so it means, this is the first one
 
     def __getEarliestDate(self, dates):
         return min(dates)
