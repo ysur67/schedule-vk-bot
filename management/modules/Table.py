@@ -124,6 +124,7 @@ class Table:
             j+=1
             i+=1
         return lessons_message
+        
     def __is_day_of_week(self, value):
         return True if value % 4 == 0 or value == 0 else False
 
@@ -140,6 +141,9 @@ class Table:
         elif value == 4:
             day = "Пятница"
         return day
+
+    def pop_file(self, file_name):
+        os.remove(str(self.__directory+'\\'+file_name+".xlsx"))
 
     def __str__(self):
         amount_of_groups = len(self.__groupNames)
