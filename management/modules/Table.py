@@ -67,10 +67,7 @@ class Table:
 
     @property
     def dates(self):
-        dates = {
-            self.__earliestFile:self.__dateManager.earliestFileDate,
-            self.currentFile:self.__dateManager.latestFileDate,
-        }
+        dates = self.__dateManager.dates.values()
         return dates
 
     @property

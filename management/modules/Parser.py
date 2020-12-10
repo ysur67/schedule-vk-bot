@@ -2,9 +2,9 @@ import requests
 from bs4 import BeautifulSoup
 import os
 import re
-from botExceptions import ModuleException
-from FileNamesManager import FileManager
-from FilesDateManager import DateManager
+from .botExceptions import ModuleException
+from .FileNamesManager import FileManager
+from .FilesDateManager import DateManager
 
 class Parser:
     def __init__(self):

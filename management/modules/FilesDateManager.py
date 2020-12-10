@@ -64,4 +64,4 @@ if __name__ == "__main__":
         )
     #print(date.File)
     print(date)
-    print(date.get_date_from_dialog_name('Расписание 30.11.20-04.12.20'))
+    print(date.get_date_from_name('Расписание 30.11.20-04.12.20'))
