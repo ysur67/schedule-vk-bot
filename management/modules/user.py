@@ -85,7 +85,16 @@ class User:
             p = Person.objects.get(
                 id = self.user_id
             )
-            tabel_name = self.tabel.dialog_file_name(p.time_table.name)
+            if(p.time_table.name in self.tabel.dates):
+                tabel_name = self.tabel.dialog_file_name(p.time_table.name)
+            else:
+                tabel_name = self.tabel.dialog_file_name(self.tabel.currentFile)
+                self.vk_api.send_message(
+                    message="Ваш выбор расписания устарел!\n"+
+                        "В данный момент вам будет выбрано последнее расписание\n"+
+                        "Не забудьте его поменять!",
+                    user_id=self.user_id,
+                    )
             system_name = self.tabel.dialog_name_to_file_name(tabel_name)
             chosen_table = Table(system_name)
             lessons = chosen_table.groupLessons(self.message)
@@ -153,10 +162,12 @@ class User:
             )
 
     def is_time_table(self, message):
-        return True if message in self.local_time_tables else False
+        names_for_comparison = [name.replace(' ', '').upper() for name in self.local_time_tables]
+        return True if message in names_for_comparison else False
 
     def is_course(self, message):
         return True if message[1:] == "КУРС" and len(message) == 5 else False
 
     def is_group_name(self, message):
         return True if self.message in self.tabel.groupNames else False
+
