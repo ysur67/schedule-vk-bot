@@ -107,7 +107,6 @@ class User:
                 message = tabel_name + "\n" 
                     + "Группа: " + group_name +
                     "\n" + lessons_for_dialog,
-
             )
         elif self.message == "НАСТРОЙКАУВЕДОМЛЕНИЙ":
             keyboard_ = Keyboard(keyboard_type="SETTINGS")

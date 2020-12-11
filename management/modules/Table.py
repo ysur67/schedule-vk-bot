@@ -78,14 +78,7 @@ class Table:
     @property
     def group_names(self):
         return self.__group_names
-
-    # @property
-    # def current_file(self):
-    #     return self._current_file
-    # @property
-    # def earliestFile(self):
-    #     return self.__earliestFile
-
+        
     @property
     def dates(self):
         dates = self.__dates_manager.dates.values()

@@ -24,7 +24,6 @@ class Parser:
         
         self.time_tables_names = self.Time_Tables(*self.__fileNames)
 
-        #self.__fileManager = FileManager(self.__fileNames[0], self.__fileNames[1])
         self.__file_manager = FileManager(*self.time_tables_names)
 
         self.__dateManager = DateManager(*self.__file_manager.filesNames)
@@ -72,7 +71,6 @@ class Parser:
             return dict(zip(self.__file_manager.filesNames, self.__hrefList[0:2]))
         else:
             return dict(zip(self.__file_manager.filesNames, self.__hrefList[0:3]))
-
 
     def __getCurrentFileName(self):
         return self.__dateManager.latestFile
