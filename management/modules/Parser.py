@@ -2,9 +2,9 @@ import requests
 from bs4 import BeautifulSoup
 import os
 import re
-from .botExceptions import ModuleException
-from .FileNamesManager import FileManager
-from .FilesDateManager import DateManager
+from botExceptions import ModuleException
+from FileNamesManager import FileManager
+from FilesDateManager import DateManager
 
 class Parser:
     def __init__(self):
@@ -23,6 +23,8 @@ class Parser:
         self.__fileNames = self.__getFileNames()
         
         self.time_tables_names = self.Time_Tables(*self.__fileNames)
+        
+        self.links_to_time_tables = self.Links()
 
         self.__file_manager = FileManager(*self.time_tables_names)
 
@@ -35,13 +37,8 @@ class Parser:
         self.__directory = self.__file_manager.filesPath
 
         self.__filePath = os.path.join(self.__directory, self.__currentTimeTableName)
-
-        self.__downloadRequest = requests.get(
-            self.__linkToTables.get(self.__dateManager.latestFile),
-            allow_redirects=True,
-            )
-
-        open(self.__filePath, 'wb').write(self.__downloadRequest.content)
+        
+        self.load_proper_files()
 
     def __getURL(self):
         try:
@@ -66,6 +63,9 @@ class Parser:
         [is_time_table(name) for name in file_names]
         return proper_files
 
+    def Links(self):
+        return dict(zip(self.time_tables_names, self.__hrefList))
+
     def __getLinks(self):
         if len(self.__file_manager.filesNames)<3:
             return dict(zip(self.__file_manager.filesNames, self.__hrefList[0:2]))
@@ -75,10 +75,14 @@ class Parser:
     def __getCurrentFileName(self):
         return self.__dateManager.latestFile
 
-    def __removeEarliest(self):
-        locFileManager = FileManager()
-        locDatesManager = DateManager(*locFileManager.localFilesNames)
-        os.remove(str(self.__directory+'\\'+locDatesManager.earliestFile+".xlsx"))
+    def load_proper_files(self):
+        for key in self.links_to_time_tables:
+            download_request = requests.get(
+                self.links_to_time_tables.get(key),
+                allow_redirects=True,
+                )
+            file_path = os.path.join(self.__directory, key) + ".xlsx"
+            open(file_path, 'wb').write(download_request.content)
 
     @property
     def latestFile(self):
@@ -95,4 +99,5 @@ class Parser:
 
 if __name__ == "__main__":
     par = Parser()
-    print(par.time_tables_names)
+    #print(par.time_tables_names)
+    #print(par.hrefs_to_time_tables)
