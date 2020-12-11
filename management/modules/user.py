@@ -13,7 +13,6 @@ from ...models import TimeTable, Person
 import re
 
 class User:
-    admin = 74363077
     def __init__(self, event_):
         self.event = event_
         self.user_id = self.event.obj.message['from_id']
@@ -87,14 +86,15 @@ class User:
             p = Person.objects.get(
                 id = self.user_id
             )
-            if(p.time_table.name in self.tabel.dates):
+            if p.time_table != None and p.time_table.name in self.tabel.dates:
                 tabel_name = self.tabel.file_name_to_dialog_name(p.time_table.name)
             else:
-                tabel_name = self.tabel.file_name_to_dialog_name(self.tabel.currentFile)
+                tabel_name = self.tabel.file_name_to_dialog_name(self.tabel._current_file)
+                Person.objects.filter(id=self.user_id).update(time_table=self.time_table[0])
                 self.vk_api.send_message(
                     message="Ваш выбор расписания устарел, оно было удалено\n"+
-                        "В данный момент вам будет выбрано последнее расписание\n"+
-                        "Не забудьте его поменять!",
+                        "В данный момент вам выбрано последнее расписание\n"+
+                        "Не забудьте его поменять, если вам необходимо другое!",
                     user_id=self.user_id,
                     )
             system_name = self.tabel.dialog_name_to_file_name(tabel_name)
@@ -139,7 +139,7 @@ class User:
             # Parser works fine
             # but there are no timetables
             # on site
-            if self.user_id == self.admin:
+            if self.user_id in self.vk_api.admins:
                 if f:
                     self.vk_api.send_message(
                         user_id = self.user_id,
@@ -157,39 +157,40 @@ class User:
                         message = "Нового расписания не найдено, отмена..."
                     )
             else:
-                self.vk_api.send_message(
-                    user_id  =self.user_id,
-                    message = "Вы не являетесь админом",
-                )
+                self.not_an_admin_error(self.user_id)
         elif self.message == "УДАЛИТЬ":
-            if self.user_id == self.admin:
+            if self.user_id in self.vk_api.admins:
                 keyboard_ = Keyboard(keyboard_type="ADMIN")
                 self.vk_api.send_message_keyboard(
-                    user_id = self.admin,
+                    user_id = self.user_id,
                     message = "Выберите, какое расписание удалить",
                     keyboard = keyboard_.get_keyboard(),
                 )
-        elif "АДМИН" in self.message:
-            if self.user_id == self.admin:
+            else:
+                self.not_an_admin_error(self.user_id)
+        elif "АДМИН" in self.message and len(self.message)>5:
+            if self.user_id in self.vk_api.admins:
                 msg = re.sub(r'АДМИН', "", self.message)
                 answ = msg.title()
                 msg = self.tabel.dialog_name_to_file_name(msg)
                 self.tabel.pop_file(msg)
                 self.vk_api.send_message(
-                    user_id=self.admin,
+                    user_id=self.user_id,
                     message=f"{answ} было удалено",
                 )
-        elif "ИНФОРМАЦИЯ" in self.message:
+            else:
+                self.not_an_admin_error(self.user_id)
+        elif self.message == "СТАТУС":
             p = Person.objects.get(
                 id = self.user_id
             )
-            message = ''
+            message = "\nВыбранное расписание:\n"
+            message += self.tabel.file_name_to_dialog_name(p.time_table.name) + "\n\n"
+            message += "Уведомления о новом расписании - "
             if p.send_notifications:
-                message += "Уведомелния - Включены\n"
+                message += "Отключены"
             else:
-                message += "Уведомления - Выключены\n"
-            message += "Выбранное расписание - " + self.tabel.dialog_file_name(p.time_table.name) + "\n"
-            #message += self.tabel._current_file
+                message += "Включены" 
             self.vk_api.send_message(
                 user_id=self.user_id,
                 message=message,
@@ -212,4 +213,10 @@ class User:
 
     def is_group_name(self, message):
         return True if self.message in self.tabel.group_names else False
+
+    def not_an_admin_error(self, user_id):
+        self.vk_api.send_message(
+            user_id=user_id,
+            message="Вы не являетесь администратором"
+        )
 
