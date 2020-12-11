@@ -184,12 +184,15 @@ class User:
                 id = self.user_id
             )
             message = "\nВыбранное расписание:\n"
-            message += self.tabel.file_name_to_dialog_name(p.time_table.name) + "\n\n"
+            if p.time_table == None:
+                message+="Выбранное вами расписание было удалено, пожалуйста, выберите другое\n"
+            else:
+                message += self.tabel.file_name_to_dialog_name(p.time_table.name) + "\n\n"
             message += "Уведомления о новом расписании - "
             if p.send_notifications:
-                message += "Отключены"
+                message += "Включены"
             else:
-                message += "Включены" 
+                message += "Отключены" 
             self.vk_api.send_message(
                 user_id=self.user_id,
                 message=message,
