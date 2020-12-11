@@ -142,6 +142,7 @@ class User:
             # but there are no timetables
             # on site
             if self.user_id in self.vk_api.admins:
+                p = Parser()
                 if f:
                     self.vk_api.send_message(
                         user_id = self.user_id,

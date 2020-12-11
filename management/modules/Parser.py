@@ -2,59 +2,58 @@ import requests
 from bs4 import BeautifulSoup
 import os
 import re
-from botExceptions import ModuleException
-from FileNamesManager import FileManager
-from FilesDateManager import DateManager
+from .botExceptions import ModuleException
+from .FileNamesManager import FileManager
+from .FilesDateManager import DateManager
 
 class Parser:
     def __init__(self):
-        self.__url = 'https://vkk.edu.ru/raspisanie-zanyatiy'
+        self._url = 'https://vkk.edu.ru/raspisanie-zanyatiy'
 
-        self.__headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36 OPR/71.0.3770.234', 'accept': '*/*'}
+        self.__headers = {
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36 OPR/71.0.3770.234',
+            'accept': '*/*'
+            }
 
-        self.__html= self.__getURL()
+        self.html= self.get_link()
 
-        self.__soup = BeautifulSoup(self.__html.text, 'html.parser')
+        self._soup = BeautifulSoup(self.html.text, 'html.parser')
 
-        self.__tags = self.__getTags()
+        self._tags = self.__getTags()
 
-        self.__hrefList = self.__getFileHrefs()
+        self.__all_links = self.File_Links()
 
-        self.__fileNames = self.__getFileNames()
+        self.__all_files_names = self.__File_Names()
         
-        self.time_tables_names = self.Time_Tables(*self.__fileNames)
+        self.time_tables_names = self.Time_Tables(*self.__all_files_names)
         
         self.links_to_time_tables = self.Links()
 
         self.__file_manager = FileManager(*self.time_tables_names)
 
-        self.__dateManager = DateManager(*self.__file_manager.filesNames)
-        
-        self.__currentTimeTableName = self.__dateManager.latestFile + ".xlsx"
+        self.__date_manager = DateManager(*self.__file_manager.filesNames)
 
-        self.__linkToTables = self.__getLinks()
+        self.__links_to_tables = self.Links()
 
         self.__directory = self.__file_manager.filesPath
-
-        self.__filePath = os.path.join(self.__directory, self.__currentTimeTableName)
         
         self.load_proper_files()
 
-    def __getURL(self):
+    def get_link(self):
         try:
-            link = requests.get(self.__url, self.__headers)
+            link = requests.get(self._url, self.__headers)
             return link
         except Exception:
             raise ModuleException("Your link might be broken or server is down")
 
     def __getTags(self):
-        return self.__soup.find_all("span", class_='file')
+        return self._soup.find_all("span", class_='file')
 
-    def __getFileHrefs(self):
-        return [span.find('a').get('href') for span in self.__tags]
+    def File_Links(self):
+        return [span.find('a').get('href') for span in self._tags]
 
-    def __getFileNames(self):
-        fileNames = [span.find('a').text for span in self.__tags]
+    def __File_Names(self):
+        fileNames = [span.find('a').text for span in self._tags]
         return fileNames
 
     def Time_Tables(self, *file_names):
@@ -64,16 +63,10 @@ class Parser:
         return proper_files
 
     def Links(self):
-        return dict(zip(self.time_tables_names, self.__hrefList))
-
-    def __getLinks(self):
-        if len(self.__file_manager.filesNames)<3:
-            return dict(zip(self.__file_manager.filesNames, self.__hrefList[0:2]))
-        else:
-            return dict(zip(self.__file_manager.filesNames, self.__hrefList[0:3]))
+        return dict(zip(self.time_tables_names, self.__all_links))
 
     def __getCurrentFileName(self):
-        return self.__dateManager.latestFile
+        return self.__date_manager.latestFile
 
     def load_proper_files(self):
         for key in self.links_to_time_tables:
@@ -84,17 +77,9 @@ class Parser:
             file_path = os.path.join(self.__directory, key) + ".xlsx"
             open(file_path, 'wb').write(download_request.content)
 
-    @property
-    def latestFile(self):
-        return self.__dateManager.latestFile
-
-    @property
-    def earliestFile(self):
-        return self.__dateManager.earliestFile
-
     def __str__(self):
-        info = "Earliest file in directory '{}'\n".format(self.__dateManager.earliestFile)
-        info += "Latest file in directory '{}'\n".format(self.__dateManager.latestFile)
+        info = "Earliest file in directory '{}'\n".format(self.__date_manager.earliestFile)
+        info += "Latest file in directory '{}'\n".format(self.__date_manager.latestFile)
         return info
 
 if __name__ == "__main__":
