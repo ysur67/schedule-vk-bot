@@ -30,14 +30,14 @@ class FileManager:
     def table_names_for_dialog(self):
         dialog_names = []
         for name in self.__localFileNames:
-            dialog_names.append(self.pop_extra_info(name).replace('  ', ''))
+            dialog_names.append(self.pop_extra_info(name))
         return dialog_names
 
     def get_proper_name(self, name):
         return self.pop_extra_info(name)
 
     def pop_extra_info(self, name):
-        return re.sub(r'очное отделение', ' ', name).replace('  ', '')
+        return re.sub(r'очное отделение', '', name).replace('   ', '')
 
     def __str__(self):
         info = "Directory contains {0} local file(s)".format(len(self.__localFileNames))
