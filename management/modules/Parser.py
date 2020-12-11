@@ -19,7 +19,7 @@ class Parser:
 
         self._soup = BeautifulSoup(self.html.text, 'html.parser')
 
-        self._tags = self.__getTags()
+        self._tags = self.__Tags()
 
         self.__all_links = self.File_Links()
 
@@ -46,7 +46,7 @@ class Parser:
         except Exception:
             raise ModuleException("Your link might be broken or server is down")
 
-    def __getTags(self):
+    def __Tags(self):
         return self._soup.find_all("span", class_='file')
 
     def File_Links(self):

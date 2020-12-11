@@ -135,25 +135,18 @@ class User:
                 message = "Теперь вы будете получать уведомления",
             )
         elif self.message == "ОБНОВИТЬ":
-            #p = Parser()
-            f = True
-            #if p.isNewFileLoaded:
-            # Parser works fine
-            # but there are no timetables
-            # on site
             if self.user_id in self.vk_api.admins:
                 p = Parser()
-                if f:
+                self.vk_api.send_message(
+                    user_id = self.user_id,
+                    message = "Найдено новое расписание, обновляю..."
+                )
+                persons_notify_true = Person.objects.filter(send_notifications=True)
+                for person in persons_notify_true:
                     self.vk_api.send_message(
-                        user_id = self.user_id,
-                        message = "Найдено новое расписание, обновляю..."
+                        user_id = person.pk,
+                        message = "Появилось новое расписание"
                     )
-                    _ = Person.objects.filter(send_notifications=True)
-                    for person in _:
-                        self.vk_api.send_message(
-                            user_id = person.pk,
-                            message = "Появилось новое расписание"
-                        )
                 else:
                     self.vk_api.send_message(
                         user_id = self.user_id,
