@@ -11,6 +11,7 @@ class API:
             )
         self.vk = self.vk_session.get_api()
         self.api_version = settings.API_VERSION
+        self.admins = settings.ADMINS
         self.longpoll = VkBotLongPoll(
             self.vk_session, 
             group_id=settings.GROUP_ID,
