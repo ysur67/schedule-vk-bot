@@ -38,6 +38,8 @@ class Keyboard:
         keyboard.add_button(label='Изменить расписание')
         keyboard.add_line()
         keyboard.add_button(label='Настройка уведомлений')
+        keyboard.add_line()
+        keyboard.add_button(label='Статус')
         return keyboard
 
     def Groups_Keyboard(self, answer):
