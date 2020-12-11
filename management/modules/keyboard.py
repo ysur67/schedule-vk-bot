@@ -17,6 +17,8 @@ class Keyboard:
             self.keyboard = self.TimeTable_Keyboard()
         elif keyboard_type == "SETTINGS":
             self.keyboard = self.Settings_Keyboard()
+        elif keyboard_type == "NOTIFY":
+            self.keyboard = self.Notify_Keyboard()
         elif keyboard_type == "ADMIN":
             self.keyboard = self.Admin_Keyboard()
     
@@ -35,11 +37,7 @@ class Keyboard:
         keyboard.add_line()
         keyboard.add_button('4 курс')
         keyboard.add_line()
-        keyboard.add_button(label='Изменить расписание')
-        keyboard.add_line()
-        keyboard.add_button(label='Настройка уведомлений')
-        keyboard.add_line()
-        keyboard.add_button(label='Статус')
+        keyboard.add_button(label="Настройки", color=VkKeyboardColor.PRIMARY)
         return keyboard
 
     def Groups_Keyboard(self, answer):
@@ -72,13 +70,24 @@ class Keyboard:
             keyboard_.add_button(time_tables[i])
             keyboard_.add_line()
             i+=1
-        keyboard_.add_button(label="Назад", color=VkKeyboardColor.PRIMARY)
+        keyboard_.add_button(label="Отмена, к настройкам", color=VkKeyboardColor.PRIMARY)
         return keyboard_
 
     def __proper_text_for_button(self, text):
         return text[0:10] + " " + text[27:]
 
     def Settings_Keyboard(self):
+        keyboard_ = VkKeyboard(**self.settings)
+        keyboard_.add_button("Изменить расписание")
+        keyboard_.add_line()
+        keyboard_.add_button("Настройка уведомлений")
+        keyboard_.add_line()
+        keyboard_.add_button("Статус")
+        keyboard_.add_line()
+        keyboard_.add_button(label="Назад", color=VkKeyboardColor.PRIMARY)
+        return keyboard_
+
+    def Notify_Keyboard(self):
         keyboard_ = VkKeyboard(**self.settings)
         keyboard_.add_button(
             label="Получать уведомления", 
@@ -90,7 +99,7 @@ class Keyboard:
             color=VkKeyboardColor.NEGATIVE,
             )
         keyboard_.add_line()
-        keyboard_.add_button(label="Назад", color=VkKeyboardColor.SECONDARY)
+        keyboard_.add_button(label="Отмена, к настройкам", color=VkKeyboardColor.SECONDARY)
         return keyboard_
 
     def Admin_Keyboard(self):

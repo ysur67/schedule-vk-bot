@@ -108,8 +108,15 @@ class User:
                     + "Группа: " + group_name +
                     "\n" + lessons_for_dialog,
             )
-        elif self.message == "НАСТРОЙКАУВЕДОМЛЕНИЙ":
+        elif self.message == "НАСТРОЙКИ" or self.message=="ОТМЕНА,КНАСТРОЙКАМ":
             keyboard_ = Keyboard(keyboard_type="SETTINGS")
+            self.vk_api.send_message_keyboard(
+                user_id=self.user_id,
+                message='Если хотите выйти, нажмите "Назад"',
+                keyboard=keyboard_.get_keyboard(),
+            )
+        elif self.message == "НАСТРОЙКАУВЕДОМЛЕНИЙ":
+            keyboard_ = Keyboard(keyboard_type="NOTIFY")
             self.vk_api.send_message_keyboard(
                 user_id = self.user_id,
                 message = "Если хотите отменить, нажмите 'Назад'",
