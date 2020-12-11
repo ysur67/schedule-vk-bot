@@ -76,13 +76,3 @@ class Parser:
                 )
             file_path = os.path.join(self.__directory, key) + ".xlsx"
             open(file_path, 'wb').write(download_request.content)
-
-    def __str__(self):
-        info = "Earliest file in directory '{}'\n".format(self.__date_manager.earliestFile)
-        info += "Latest file in directory '{}'\n".format(self.__date_manager.latestFile)
-        return info
-
-if __name__ == "__main__":
-    par = Parser()
-    #print(par.time_tables_names)
-    #print(par.hrefs_to_time_tables)
