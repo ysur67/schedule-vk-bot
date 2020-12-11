@@ -43,7 +43,9 @@ class User:
                 user_id=self.user_id,
                 message=f"Добро пожаловать, {self.name}\n"+
                     "Вам было установлено последнeе расписание\n"+
-                    'Если хотите изменить, нажмите "Изменить расписание"',
+                    'Если хотите изменить, нажмите "Изменить расписание"\n'+
+                    'По умолчанию вы не получаете уведомлений\n'+
+                    'Поэтому, если хотите это поменять, зайдите в настройки',
                 keyboard=keyboard_.get_keyboard(),
             )
         elif self.message == "НАЧАТЬ" or self.message == "НАЗАД" or self.message == "ГЛАВНОЕМЕНЮ":
@@ -146,11 +148,6 @@ class User:
                     self.vk_api.send_message(
                         user_id = person.pk,
                         message = "Появилось новое расписание"
-                    )
-                else:
-                    self.vk_api.send_message(
-                        user_id = self.user_id,
-                        message = "Нового расписания не найдено, отмена..."
                     )
             else:
                 self.not_an_admin_error(self.user_id)
