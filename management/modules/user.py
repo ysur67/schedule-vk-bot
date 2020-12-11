@@ -141,7 +141,7 @@ class User:
                 p = Parser()
                 self.vk_api.send_message(
                     user_id = self.user_id,
-                    message = "Найдено новое расписание, обновляю..."
+                    message = "Обновляю..."
                 )
                 persons_notify_true = Person.objects.filter(send_notifications=True)
                 for person in persons_notify_true:
