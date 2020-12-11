@@ -170,12 +170,13 @@ class User:
                 )
         elif "АДМИН" in self.message:
             if self.user_id == self.admin:
-                msg = re.sub(r'админ', "", self.message)
+                msg = re.sub(r'АДМИН', "", self.message)
+                answ = msg.title()
                 msg = self.tabel.dialog_name_to_file_name(msg)
                 self.tabel.pop_file(msg)
                 self.vk_api.send_message(
                     user_id=self.admin,
-                    message="done",
+                    message=f"{answ} было удалено",
                 )
         else:
             keyboard_ = Keyboard(keyboard_type="BEGIN")
