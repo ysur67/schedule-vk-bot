@@ -178,6 +178,20 @@ class User:
                     user_id=self.admin,
                     message=f"{answ} было удалено",
                 )
+        elif "ИНФОРМАЦИЯ" in self.message:
+            p = Person.objects.get(
+                id = self.user_id
+            )
+            message = ''
+            if p.send_notifications:
+                message += "Уведомелния - Включены\n"
+            else:
+                message += "Уведомления - Выключены\n"
+            message += "Выбранное расписание - " + p.time_table.name + "\n"
+            self.vk_api.send_message(
+                user_id=self.user_id,
+                message=message,
+            )
         else:
             keyboard_ = Keyboard(keyboard_type="BEGIN")
             self.vk_api.send_message_keyboard(
