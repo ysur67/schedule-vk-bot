@@ -46,7 +46,7 @@ class User:
                     'Если хотите изменить, нажмите "Изменить расписание"',
                 keyboard=keyboard_.get_keyboard(),
             )
-        elif self.message == "НАЧАТЬ" or self.message == "НАЗАД":
+        elif self.message == "НАЧАТЬ" or self.message == "НАЗАД" or self.message == "ГЛАВНОЕМЕНЮ":
             keyboard_ = Keyboard(keyboard_type="COURSES")
             self.vk_api.send_message_keyboard(
                 message = "Главное меню",
@@ -123,20 +123,16 @@ class User:
                 keyboard = keyboard_.get_keyboard()
             )
         elif self.message == "НЕПОЛУЧАТЬУВЕДОМЛЕНИЙ":
-            keyboard_ = Keyboard(keyboard_type="BEGIN")
             Person.objects.filter(id=self.user_id).update(send_notifications=False)
-            self.vk_api.send_message_keyboard(
+            self.vk_api.send_message(
                 user_id = self.user_id,
                 message = "Вы больше не будете получать уведомлений",
-                keyboard = keyboard_.get_keyboard(),
             )
         elif self.message == "ПОЛУЧАТЬУВЕДОМЛЕНИЯ":
-            keyboard_ = Keyboard(keyboard_type="BEGIN")
             Person.objects.filter(id=self.user_id).update(send_notifications=True)
-            self.vk_api.send_message_keyboard(
+            self.vk_api.send_message(
                 user_id = self.user_id,
                 message = "Теперь вы будете получать уведомления",
-                keyboard = keyboard_.get_keyboard(),
             )
         elif self.message == "ОБНОВИТЬ":
             #p = Parser()

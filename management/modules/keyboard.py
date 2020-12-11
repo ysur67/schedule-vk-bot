@@ -70,7 +70,9 @@ class Keyboard:
             keyboard_.add_button(time_tables[i])
             keyboard_.add_line()
             i+=1
-        keyboard_.add_button(label="Отмена, к настройкам", color=VkKeyboardColor.PRIMARY)
+        keyboard_.add_button(label="Отмена, к настройкам", color=VkKeyboardColor.SECONDARY)
+        keyboard_.add_line()
+        keyboard_.add_button(label="Главное меню", color=VkKeyboardColor.PRIMARY)
         return keyboard_
 
     def __proper_text_for_button(self, text):
@@ -100,6 +102,8 @@ class Keyboard:
             )
         keyboard_.add_line()
         keyboard_.add_button(label="Отмена, к настройкам", color=VkKeyboardColor.SECONDARY)
+        keyboard_.add_line()
+        keyboard_.add_button(label="Главное меню", color=VkKeyboardColor.PRIMARY)
         return keyboard_
 
     def Admin_Keyboard(self):
