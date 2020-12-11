@@ -22,7 +22,7 @@ class User:
         self.name = self.vk_api.vk.users.get(user_id=self.user_id)[0].get('first_name')
         self.tabel = Table()
         self.time_table = TimeTable.objects.get_or_create(
-            name = self.tabel.currentFile,
+            name = self.tabel._current_file,
             date = self.tabel.current_file_date,
         )
         self.person, self.made_now = Person.objects.get_or_create(
@@ -88,9 +88,9 @@ class User:
                 id = self.user_id
             )
             if(p.time_table.name in self.tabel.dates):
-                tabel_name = self.tabel.dialog_file_name(p.time_table.name)
+                tabel_name = self.tabel.file_name_to_dialog_name(p.time_table.name)
             else:
-                tabel_name = self.tabel.dialog_file_name(self.tabel.currentFile)
+                tabel_name = self.tabel.file_name_to_dialog_name(self.tabel.currentFile)
                 self.vk_api.send_message(
                     message="Ваш выбор расписания устарел, оно было удалено\n"+
                         "В данный момент вам будет выбрано последнее расписание\n"+
@@ -100,13 +100,14 @@ class User:
             system_name = self.tabel.dialog_name_to_file_name(tabel_name)
             chosen_table = Table(system_name)
             lessons = chosen_table.groupLessons(self.message)
-            lessons_for_dialog = chosen_table.getProperLessons(lessons)
+            lessons_for_dialog = chosen_table.get_proper_lessons(lessons)
             group_name = self.message
             self.vk_api.send_message(
                 user_id = self.user_id,
                 message = tabel_name + "\n" 
-                    + "Группа: " + group_name + 
+                    + "Группа: " + group_name +
                     "\n" + lessons_for_dialog,
+
             )
         elif self.message == "НАСТРОЙКАУВЕДОМЛЕНИЙ":
             keyboard_ = Keyboard(keyboard_type="SETTINGS")
@@ -187,7 +188,8 @@ class User:
                 message += "Уведомелния - Включены\n"
             else:
                 message += "Уведомления - Выключены\n"
-            message += "Выбранное расписание - " + p.time_table.name + "\n"
+            message += "Выбранное расписание - " + self.tabel.dialog_file_name(p.time_table.name) + "\n"
+            #message += self.tabel._current_file
             self.vk_api.send_message(
                 user_id=self.user_id,
                 message=message,
@@ -209,5 +211,5 @@ class User:
         return True if message[1:] == "КУРС" and len(message) == 5 else False
 
     def is_group_name(self, message):
-        return True if self.message in self.tabel.groupNames else False
+        return True if self.message in self.tabel.group_names else False
 

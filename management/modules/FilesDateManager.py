@@ -3,7 +3,6 @@ import re
 
 class DateManager:
     def __init__(self, *filesNames):
-        #self.__amountOfFiles = filesNames.__len__()
         self.__filesNames = filesNames
         self.__dates = self.__all_dates()
         self.__earliestFile = self.__dates.get(self.__getEarliestDate(self.__dates))

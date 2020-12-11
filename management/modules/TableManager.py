@@ -64,3 +64,47 @@ class TableManager:
 
     def group_names(self):
         return list(self.groups_and_locations.keys())
+
+    def get_proper_lessons(self, lessons):
+        i = 0
+        k = 0
+        j = 1
+        lessons_message = ''
+        while i<len(lessons):
+            if self.__is_day_of_week(i):
+                day_of_week = self.__which_day(k)
+                j=1
+                k+=1
+                lessons_message += f"\n\n{day_of_week}"
+            if(lessons[i]==None):
+                lessons_message += '\n{}. '.format(j)   
+            else:
+                number = str(lessons[i]).replace('\t', ' ').replace(' ', '')
+                try:
+                    number = int(number[0])
+                except(ValueError):
+                    number = 'a'
+                if(number in range(0, 10)):
+                    lessons_message += '\n'+lessons[i].replace('  ', '')
+                else:
+                    lessons_message += '\n' + '{}. '.format(j) + str(lessons[i]).replace('   ', ' ')
+            j+=1
+            i+=1
+        return lessons_message
+
+    def __is_day_of_week(self, value):
+        return True if value % 4 == 0 or value == 0 else False
+
+    def __which_day(self, value):
+        day = ""
+        if value == 0:
+            day = "Понедельник"
+        elif value == 1:
+            day = "Вторник"
+        elif value == 2:
+            day = "Среда"
+        elif value == 3:
+            day = "Четверг"
+        elif value == 4:
+            day = "Пятница"
+        return day
