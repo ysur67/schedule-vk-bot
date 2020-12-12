@@ -3,6 +3,7 @@ import os
 from .FileNamesManager import FileManager
 from .FilesDateManager import DateManager
 from .TableManager import TableManager
+from .Parser import Parser
 
 class Table:
     def __init__(self, fileName=""):
@@ -12,6 +13,11 @@ class Table:
         self.__directory = self.__file_manager.filesPath
 
         self.__fileNames = self.__file_manager.localFilesNames
+        
+        if len(self.__fileNames) == 0:
+            Parser()
+            self.__file_manager.update_all()
+            self.__fileNames = self.__file_manager.localFilesNames
 
         self.__dates_manager = DateManager(*self.__fileNames)
 
@@ -95,3 +101,6 @@ class Table:
     @property
     def current_file_date(self):
         return self.__dates_manager.latestFileDate
+
+if __name__ == "__main__":
+    Table()

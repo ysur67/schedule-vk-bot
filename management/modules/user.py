@@ -20,6 +20,8 @@ class User:
         self.vk_api = API()
         self.name = self.vk_api.vk.users.get(user_id=self.user_id)[0].get('first_name')
         self.tabel = Table()
+        if self.tabel.dates == None:
+            Parser()
         self.time_table = TimeTable.objects.get_or_create(
             name = self.tabel._current_file,
             date = self.tabel.current_file_date,

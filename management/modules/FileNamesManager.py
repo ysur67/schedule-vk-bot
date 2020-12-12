@@ -5,6 +5,7 @@ class FileManager:
     def __init__(self, *files):
         self.__directory = os.path.join( os.path.dirname( __file__ ), '..' ) + "\\files"
         self.__localFileNames = self.__getLocalNames()
+        self.__files = files
         self.__fileNames = self.__fillList(files)
             
     def __fillList(self, files):
@@ -13,6 +14,10 @@ class FileManager:
     def __getLocalNames(self):
         localNames = os.listdir(self.__directory)
         return [name[:-5] for name in localNames]
+
+    def update_all(self):
+        self.__localFileNames = self.__getLocalNames()
+        self.__fileNames = self.__fillList(self.__files)
 
     @property
     def filesNames(self):
