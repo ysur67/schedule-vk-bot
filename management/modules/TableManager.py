@@ -89,13 +89,23 @@ class TableManager:
                     lessons_message += '\n'
                 else:
                     lessons_message += '\n' + '{}. '.format(j)
-                #lessons_message += re.sub(r'\b[А-Я]\w+\b \b[А-Я]\b.\b[А-Я]\b.', "Руководитель", str(lessons[i]).replace("    ", ""))
-                teacher_name = re.search(r'\b[А-Я]\w+\b \b[А-Я]\b.\b[А-Я]\b.', str(lessons[i]).replace("    ", " ").replace("  ", " ").replace("   ", " "))
+                
+                classroom = re.search(r'\d{3}', str(lessons[i]))
+
+                teacher_name = re.search(r'\b[А-Я]\w+\b \b[А-Я]\b.\b[А-Я]\b.', str(lessons[i]).replace("    ", " ").replace("  ", " ").replace("   ", " ").replace("    ", ''))
+
                 if teacher_name != None:
-                    lessons_message += str(lessons[i])[:teacher_name.start()]+" Преподаватель: "+str(lessons[i])[teacher_name.start():]
+                    try:
+                        lessons_message += str(lessons[i])[:teacher_name.start()]+"    \n\t\t&#128100; "+str(lessons[i])[teacher_name.start():classroom.start()].replace("  ", "")
+                    except AttributeError:
+                        lessons_message += str(lessons[i])[:teacher_name.start()]+"    \n\t\t&#128100; "+str(lessons[i])[teacher_name.start():].replace("  ", "")
                 else:
-                    lessons_message += str(lessons[i])
-                #lessons_message.replace(" ", "")
+                    lessons_message += str(lessons[i]).replace("     ", " ")
+
+                if classroom != None:
+                    lessons_message += " \n&#128306; Аудитория: "+str(lessons[i])[classroom.start():]
+                else:
+                    lessons_message += ""
             j+=1
             i+=1
         return lessons_message
