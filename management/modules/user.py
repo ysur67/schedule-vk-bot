@@ -45,14 +45,10 @@ class User:
             keyboard_ = Keyboard(keyboard_type="COURSES")
             self.api.send_message_keyboard(
                 user_id=self.user_id,
-                message=f"Добро пожаловать, {self.name} {self.last_name}\n"+
-                    "Вам было установлено последнeе расписание\n"+
-                    'Если хотите изменить, нажмите "Изменить расписание"\n'+
-                    'По умолчанию вы не получаете уведомлений\n'+
-                    'Поэтому, если хотите это поменять, зайдите в настройки',
+                message=self.hello_message(),
                 keyboard=keyboard_.get_keyboard(),
             )
-        elif self.message == "НАЧАТЬ" or self.message == "НАЗАД" or self.message == "ГЛАВНОЕМЕНЮ":
+        elif self.is_begin_message(self.message):
             keyboard_ = Keyboard(keyboard_type="COURSES")
             self.api.send_message_keyboard(
                 message = "Главное меню",
@@ -89,31 +85,7 @@ class User:
                 keyboard = keyboard_.get_keyboard(),
             )
         elif self.is_group_name(self.message):
-            p = Person.objects.get(
-                id = self.user_id
-            )
-            if p.time_table != None and p.time_table.name in self.tabel.dates:
-                tabel_name = self.tabel.file_name_to_dialog_name(p.time_table.name)
-            else:
-                tabel_name = self.tabel.file_name_to_dialog_name(self.tabel._current_file)
-                Person.objects.filter(id=self.user_id).update(time_table=self.time_table[0])
-                self.api.send_message(
-                    message="Ваш выбор расписания устарел, оно было удалено\n"+
-                        "В данный момент вам выбрано последнее расписание\n"+
-                        "Не забудьте его поменять, если вам необходимо другое!",
-                    user_id=self.user_id,
-                    )
-            system_name = self.tabel.dialog_name_to_file_name(tabel_name)
-            chosen_table = Table(system_name)
-            lessons = chosen_table.groupLessons(self.message)
-            lessons_for_dialog = chosen_table.get_proper_lessons(lessons)
-            group_name = self.message
-            self.api.send_message(
-                user_id = self.user_id,
-                message = tabel_name + "\n" 
-                    + "Группа: " + group_name +
-                    "\n" + lessons_for_dialog,
-            )
+            self.lessons_handler()
         elif self.message == "НАСТРОЙКИ" or self.message=="ОТМЕНА,КНАСТРОЙКАМ":
             keyboard_ = Keyboard(keyboard_type="SETTINGS")
             self.api.send_message_keyboard(
@@ -141,22 +113,16 @@ class User:
                 message = "Теперь вы будете получать уведомления",
             )
         elif self.message == "ОБНОВИТЬ":
-            if self.user_id in self.api.admins:
-                p = Parser()
+            if self.user_is_admin():
+                self.update_handler()
                 self.api.send_message(
                     user_id = self.user_id,
-                    message = "Обновляю..."
+                    message = "Обновление расписаний..."
                 )
-                persons_notify_true = Person.objects.filter(send_notifications=True)
-                for person in persons_notify_true:
-                    self.api.send_message(
-                        user_id = person.pk,
-                        message = "Появилось новое расписание"
-                    )
             else:
                 self.not_an_admin_error(self.user_id)
         elif self.message == "УДАЛИТЬ":
-            if self.user_id in self.api.admins:
+            if self.user_is_admin():
                 keyboard_ = Keyboard(keyboard_type="ADMIN")
                 self.api.send_message_keyboard(
                     user_id = self.user_id,
@@ -165,35 +131,20 @@ class User:
                 )
             else:
                 self.not_an_admin_error(self.user_id)
-        elif "АДМИН" in self.message and len(self.message)>5:
-            if self.user_id in self.api.admins:
-                msg = re.sub(r'АДМИН', "", self.message)
-                answ = msg.title()
-                msg = self.tabel.dialog_name_to_file_name(msg)
-                self.tabel.pop_file(msg)
+        elif self.is_delete_message():
+            if self.user_is_admin():
+                self.delete_file_handler()
                 self.api.send_message(
                     user_id=self.user_id,
-                    message=f"{answ} было удалено",
+                    message="Выбранное вами расписание было удалено",
                 )
             else:
                 self.not_an_admin_error(self.user_id)
         elif self.message == "СТАТУС":
-            p = Person.objects.get(
-                id = self.user_id
-            )
-            message = "\nВыбранное расписание:\n"
-            if p.time_table == None:
-                message+="Выбранное вами расписание было удалено, пожалуйста, выберите другое\n"
-            else:
-                message += self.tabel.file_name_to_dialog_name(p.time_table.name) + "\n\n"
-            message += "Уведомления о новом расписании - "
-            if p.send_notifications:
-                message += "Включены"
-            else:
-                message += "Отключены" 
+            answer = self.status_handler()
             self.api.send_message(
                 user_id=self.user_id,
-                message=message,
+                message=answer,
             )
         else:
             keyboard_ = Keyboard(keyboard_type="BEGIN")
@@ -204,6 +155,22 @@ class User:
                 keyboard = keyboard_.get_keyboard(),
             )
 
+    def hello_message(self):
+        message = f"Добро пожаловать, {self.name} {self.last_name}\n"
+        message += "Вам было установлено последнeе расписание\n"
+        message += 'Если хотите изменить, нажмите "Изменить расписание"\n'
+        message += '\nПо умолчанию вы не получаете уведомлений\n'
+        message += 'Поэтому, если хотите это поменять, зайдите в настройки'
+        # I don't know why
+        # but constructions like this one
+        # message = "abc" + 
+        #   "cba"
+        # isn't working here
+        return message
+
+    def is_begin_message(self, message):
+        return True if self.message == "НАЧАТЬ" or self.message == "НАЗАД" or self.message == "ГЛАВНОЕМЕНЮ" else False
+
     def is_time_table(self, message):
         names_for_comparison = [name.replace(' ', '').upper() for name in self.local_time_tables]
         return True if message in names_for_comparison else False
@@ -213,6 +180,79 @@ class User:
 
     def is_group_name(self, message):
         return True if self.message in self.tabel.group_names else False
+
+    def is_time_table_exists(self, person):
+        return True if person.time_table != None and person.time_table.name in self.tabel.dates else False
+
+    def is_delete_message(self):
+        return True if "АДМИН" in self.message and len(self.message)>5 else False
+
+    def user_is_admin(self):
+        return True if self.user_id in self.api.admins else False
+
+    def lessons_handler(self):
+        person = Person.objects.get(
+                id = self.user_id
+            )
+        if self.is_time_table_exists(person):
+            tabel_name = self.tabel.file_name_to_dialog_name(person.time_table.name)
+        else:
+            tabel_name = self.tabel.file_name_to_dialog_name(self.tabel._current_file)
+            Person.objects.filter(id=self.user_id).update(time_table=self.time_table[0])
+            self.api.send_message(
+                message=self.outdated_message(),
+                user_id=self.user_id,
+                )
+        system_name = self.tabel.dialog_name_to_file_name(tabel_name)
+        chosen_table = Table(system_name)
+        lessons = chosen_table.groupLessons(self.message)
+        lessons_for_dialog = chosen_table.get_proper_lessons(lessons)
+        group_name = self.message
+        self.api.send_message(
+            user_id = self.user_id,
+            message = tabel_name + "\n" 
+                + "Группа: " + group_name +
+                "\n" + lessons_for_dialog,
+        )
+
+    def outdated_message(self):
+        message = "Ваш выбор расписания устарел, оно было удалено\n"
+        message += "В данный момент вам выбрано последнее расписание\n"
+        message += "Не забудьте его поменять, если вам необходимо другое!"
+        return message
+
+    def delete_file_handler(self):
+        dialog_file_name = re.sub(r'АДМИН', "", self.message).title()
+        file_to_delete = self.tabel.dialog_name_to_file_name(dialog_file_name)
+        self.tabel.pop_file(file_to_delete)
+
+    def update_handler(self):
+        Parser()
+        self.notify_users()
+
+    def notify_users(self):
+        persons_notify_true = Person.objects.filter(send_notifications=True)
+        for person in persons_notify_true:
+            self.api.send_message(
+                user_id = person.pk,
+                message = "Появилось новое расписание"
+            )
+
+    def status_handler(self):
+        p = Person.objects.get(
+                id = self.user_id
+            )
+        message = "\nВыбранное расписание:\n"
+        if p.time_table == None:
+            message+="Выбранное вами расписание было удалено, пожалуйста, выберите другое\n"
+        else:
+            message += self.tabel.file_name_to_dialog_name(p.time_table.name) + "\n\n"
+        message += "Уведомления о новом расписании - "
+        if p.send_notifications:
+            message += "Включены"
+        else:
+            message += "Отключены" 
+        return message
 
     def not_an_admin_error(self, user_id):
         self.api.send_message(
