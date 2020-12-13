@@ -216,7 +216,7 @@ class User:
         )
 
     def outdated_message(self):
-        message = "Ваш выбор расписания устарел, оно было удалено\n"
+        message = "&#10071; Ваш выбор расписания устарел, оно было удалено\n"
         message += "В данный момент вам выбрано последнее расписание\n"
         message += "Не забудьте его поменять, если вам необходимо другое!"
         return message
@@ -244,14 +244,14 @@ class User:
             )
         message = "\nВыбранное расписание:\n"
         if p.time_table == None:
-            message+="Выбранное вами расписание было удалено, пожалуйста, выберите другое\n"
+            message+="&#10071; Выбранное вами расписание было удалено, пожалуйста, выберите другое\n"
         else:
             message += self.tabel.file_name_to_dialog_name(p.time_table.name) + "\n\n"
         message += "Уведомления о новом расписании - "
         if p.send_notifications:
-            message += "Включены"
+            message += "&#9989; Включены"
         else:
-            message += "Отключены" 
+            message += "&#10060; Отключены" 
         return message
 
     def not_an_admin_error(self, user_id):
