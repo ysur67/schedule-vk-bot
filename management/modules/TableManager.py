@@ -1,5 +1,6 @@
 from openpyxl import load_workbook
 import os
+import re
 
 class TableManager:
     def __init__(self, work_sheet):
@@ -85,9 +86,16 @@ class TableManager:
                 except(ValueError):
                     number = 'a'
                 if(number in range(0, 10)):
-                    lessons_message += '\n'+lessons[i].replace('  ', '')
+                    lessons_message += '\n'
                 else:
-                    lessons_message += '\n' + '{}. '.format(j) + str(lessons[i]).replace('   ', ' ')
+                    lessons_message += '\n' + '{}. '.format(j)
+                #lessons_message += re.sub(r'\b[А-Я]\w+\b \b[А-Я]\b.\b[А-Я]\b.', "Руководитель", str(lessons[i]).replace("    ", ""))
+                teacher_name = re.search(r'\b[А-Я]\w+\b \b[А-Я]\b.\b[А-Я]\b.', str(lessons[i]).replace("    ", " ").replace("  ", " ").replace("   ", " "))
+                if teacher_name != None:
+                    lessons_message += str(lessons[i])[:teacher_name.start()]+" Преподаватель: "+str(lessons[i])[teacher_name.start():]
+                else:
+                    lessons_message += str(lessons[i])
+                #lessons_message.replace(" ", "")
             j+=1
             i+=1
         return lessons_message
