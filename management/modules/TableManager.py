@@ -90,22 +90,24 @@ class TableManager:
                 else:
                     lessons_message += '\n' + '{}. '.format(j)
                 
-                classroom = re.search(r'\d{3}', str(lessons[i]))
+                classrooms = re.findall(r'\d{3}\w*', str(lessons[i]))
+                
+                teachers = re.findall(r'\b[А-Я]\w+\b \b[А-Я]\b.\b[А-Я]\b.', str(lessons[i]).replace("\t", " ").replace("\n", " "))
 
-                teacher_name = re.search(r'\b[А-Я]\w+\b \b[А-Я]\b.\b[А-Я]\b.', str(lessons[i]).replace("    ", " ").replace("  ", " ").replace("   ", " ").replace("    ", ''))
+                first_teacher_name = re.search(r'\b[А-Я]\w+\b \b[А-Я]\b.\b[А-Я]\b.', str(lessons[i]).replace("\t", " ").replace("\n", " "))#.replace("   ", " ").replace("    ", ''))
 
-                if teacher_name != None:
-                    try:
-                        lessons_message += str(lessons[i])[:teacher_name.start()]+"    \n\t\t&#128100; "+str(lessons[i])[teacher_name.start():classroom.start()].replace("  ", "")
-                    except AttributeError:
-                        lessons_message += str(lessons[i])[:teacher_name.start()]+"    \n\t\t&#128100; "+str(lessons[i])[teacher_name.start():].replace("  ", "")
+                result = ""
+                if len(teachers)>0:
+                    for teacher in teachers:
+                        result += "   \n\t\t&#128100; " + teacher + " "
+                        
+                    for classroom in classrooms:
+                        result += "   \n\t\t&#128306; Аудитория: " + classroom + " " 
+
+                    p = str(lessons[i])[:first_teacher_name.start()]                
+                    lessons_message += p + result
                 else:
-                    lessons_message += str(lessons[i]).replace("     ", " ")
-
-                if classroom != None:
-                    lessons_message += " \n&#128306; Аудитория: "+str(lessons[i])[classroom.start():]
-                else:
-                    lessons_message += ""
+                    lessons_message += str(lessons[i])
             j+=1
             i+=1
         return lessons_message
