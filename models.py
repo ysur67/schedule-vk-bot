@@ -34,6 +34,12 @@ class Person(models.Model):
         default="No Data",
     )
 
+    last_name = models.CharField(
+        max_length=100,
+        help_text="User's last name, should be taken from VK",
+        default="No Data",
+    )
+
     time_table = models.ForeignKey(
         'TimeTable',
         on_delete=models.SET_NULL,
