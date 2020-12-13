@@ -17,8 +17,9 @@ class User:
         self.event = event_
         self.user_id = self.event.obj.message['from_id']
         self.message = self.event.obj.message['text'].upper().replace(" ", "")
-        self.vk_api = API()
-        self.name = self.vk_api.vk.users.get(user_id=self.user_id)[0].get('first_name')
+        self.api = API()
+        self.name = self.api.vk.users.get(user_id=self.user_id)[0].get('first_name')
+        self.last_name = self.api.vk.users.get(user_id=self.user_id)[0].get('last_name')
         self.tabel = Table()
         if self.tabel.dates == None:
             Parser()
@@ -26,10 +27,11 @@ class User:
             name = self.tabel._current_file,
             date = self.tabel.current_file_date,
         )
-        self.person, self.made_now = Person.objects.get_or_create(
+        self.person, self.new_user = Person.objects.get_or_create(
             id = self.user_id,
             defaults = {
                 'name':self.name,
+                'last_name':self.last_name,
                 'time_table':TimeTable.objects.filter(
                     id=self.time_table[0].pk
                 ).get(),
@@ -39,11 +41,11 @@ class User:
         self.what_in_message()
 
     def what_in_message(self):
-        if self.made_now == True:
+        if self.new_user:
             keyboard_ = Keyboard(keyboard_type="COURSES")
-            self.vk_api.send_message_keyboard(
+            self.api.send_message_keyboard(
                 user_id=self.user_id,
-                message=f"Добро пожаловать, {self.name}\n"+
+                message=f"Добро пожаловать, {self.name} {self.last_name}\n"+
                     "Вам было установлено последнeе расписание\n"+
                     'Если хотите изменить, нажмите "Изменить расписание"\n'+
                     'По умолчанию вы не получаете уведомлений\n'+
@@ -52,14 +54,14 @@ class User:
             )
         elif self.message == "НАЧАТЬ" or self.message == "НАЗАД" or self.message == "ГЛАВНОЕМЕНЮ":
             keyboard_ = Keyboard(keyboard_type="COURSES")
-            self.vk_api.send_message_keyboard(
+            self.api.send_message_keyboard(
                 message = "Главное меню",
                 user_id = self.event.obj.message['from_id'],
                 keyboard = keyboard_.get_keyboard(),
                 )
         elif self.message == "ИЗМЕНИТЬРАСПИСАНИЕ":
             keyboard_ = Keyboard(keyboard_type="TIMETABLE")
-            self.vk_api.send_message_keyboard(
+            self.api.send_message_keyboard(
                 user_id = self.user_id,
                 message = "Выберите расписание",
                 keyboard = keyboard_.get_keyboard(),
@@ -74,14 +76,14 @@ class User:
             # I don't know why should I get id from tuple like I did it above
             # but it works just fine :)
             keyboard_ = Keyboard(keyboard_type="COURSES")
-            self.vk_api.send_message_keyboard(
+            self.api.send_message_keyboard(
                 user_id = self.user_id,
                 message = "Ваше расписание обновлено",
                 keyboard = keyboard_.get_keyboard(),
             )
         elif self.is_course(self.message):
             keyboard_ = Keyboard(keyboard_type="GROUPS", message=self.message)
-            self.vk_api.send_message_keyboard(
+            self.api.send_message_keyboard(
                 user_id = self.user_id,
                 message = "Выберите группу",
                 keyboard = keyboard_.get_keyboard(),
@@ -95,7 +97,7 @@ class User:
             else:
                 tabel_name = self.tabel.file_name_to_dialog_name(self.tabel._current_file)
                 Person.objects.filter(id=self.user_id).update(time_table=self.time_table[0])
-                self.vk_api.send_message(
+                self.api.send_message(
                     message="Ваш выбор расписания устарел, оно было удалено\n"+
                         "В данный момент вам выбрано последнее расписание\n"+
                         "Не забудьте его поменять, если вам необходимо другое!",
@@ -106,7 +108,7 @@ class User:
             lessons = chosen_table.groupLessons(self.message)
             lessons_for_dialog = chosen_table.get_proper_lessons(lessons)
             group_name = self.message
-            self.vk_api.send_message(
+            self.api.send_message(
                 user_id = self.user_id,
                 message = tabel_name + "\n" 
                     + "Группа: " + group_name +
@@ -114,49 +116,49 @@ class User:
             )
         elif self.message == "НАСТРОЙКИ" or self.message=="ОТМЕНА,КНАСТРОЙКАМ":
             keyboard_ = Keyboard(keyboard_type="SETTINGS")
-            self.vk_api.send_message_keyboard(
+            self.api.send_message_keyboard(
                 user_id=self.user_id,
                 message='Если хотите выйти, нажмите "Назад"',
                 keyboard=keyboard_.get_keyboard(),
             )
         elif self.message == "НАСТРОЙКАУВЕДОМЛЕНИЙ":
             keyboard_ = Keyboard(keyboard_type="NOTIFY")
-            self.vk_api.send_message_keyboard(
+            self.api.send_message_keyboard(
                 user_id = self.user_id,
                 message = "Если хотите отменить, нажмите 'Назад'",
                 keyboard = keyboard_.get_keyboard()
             )
         elif self.message == "НЕПОЛУЧАТЬУВЕДОМЛЕНИЙ":
             Person.objects.filter(id=self.user_id).update(send_notifications=False)
-            self.vk_api.send_message(
+            self.api.send_message(
                 user_id = self.user_id,
                 message = "Вы больше не будете получать уведомлений",
             )
         elif self.message == "ПОЛУЧАТЬУВЕДОМЛЕНИЯ":
             Person.objects.filter(id=self.user_id).update(send_notifications=True)
-            self.vk_api.send_message(
+            self.api.send_message(
                 user_id = self.user_id,
                 message = "Теперь вы будете получать уведомления",
             )
         elif self.message == "ОБНОВИТЬ":
-            if self.user_id in self.vk_api.admins:
+            if self.user_id in self.api.admins:
                 p = Parser()
-                self.vk_api.send_message(
+                self.api.send_message(
                     user_id = self.user_id,
                     message = "Обновляю..."
                 )
                 persons_notify_true = Person.objects.filter(send_notifications=True)
                 for person in persons_notify_true:
-                    self.vk_api.send_message(
+                    self.api.send_message(
                         user_id = person.pk,
                         message = "Появилось новое расписание"
                     )
             else:
                 self.not_an_admin_error(self.user_id)
         elif self.message == "УДАЛИТЬ":
-            if self.user_id in self.vk_api.admins:
+            if self.user_id in self.api.admins:
                 keyboard_ = Keyboard(keyboard_type="ADMIN")
-                self.vk_api.send_message_keyboard(
+                self.api.send_message_keyboard(
                     user_id = self.user_id,
                     message = "Выберите, какое расписание удалить",
                     keyboard = keyboard_.get_keyboard(),
@@ -164,12 +166,12 @@ class User:
             else:
                 self.not_an_admin_error(self.user_id)
         elif "АДМИН" in self.message and len(self.message)>5:
-            if self.user_id in self.vk_api.admins:
+            if self.user_id in self.api.admins:
                 msg = re.sub(r'АДМИН', "", self.message)
                 answ = msg.title()
                 msg = self.tabel.dialog_name_to_file_name(msg)
                 self.tabel.pop_file(msg)
-                self.vk_api.send_message(
+                self.api.send_message(
                     user_id=self.user_id,
                     message=f"{answ} было удалено",
                 )
@@ -189,13 +191,13 @@ class User:
                 message += "Включены"
             else:
                 message += "Отключены" 
-            self.vk_api.send_message(
+            self.api.send_message(
                 user_id=self.user_id,
                 message=message,
             )
         else:
             keyboard_ = Keyboard(keyboard_type="BEGIN")
-            self.vk_api.send_message_keyboard(
+            self.api.send_message_keyboard(
                 user_id = self.user_id,
                 message = 'Я вас не понимаю\nПожалуйста, пользуйтесь кнопками\n'+
                     'Что бы продолжить нажмите "Начать"',
@@ -213,7 +215,7 @@ class User:
         return True if self.message in self.tabel.group_names else False
 
     def not_an_admin_error(self, user_id):
-        self.vk_api.send_message(
+        self.api.send_message(
             user_id=user_id,
             message="Вы не являетесь администратором"
         )
