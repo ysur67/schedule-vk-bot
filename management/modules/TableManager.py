@@ -97,7 +97,8 @@ class TableManager:
                 first_teacher_name = re.search(r'\b[А-Я]\w+\b \b[А-Я]\b.\b[А-Я]\b.', str(lessons[i]).replace("\t", " ").replace("\n", " "))#.replace("   ", " ").replace("    ", ''))
 
                 result = ""
-                if len(teachers)>0:
+                
+                if len(teachers)>0 or len(classrooms)>0:
                     for teacher in teachers:
                         result += "   \n\t\t&#128100; " + teacher + " "
                         
