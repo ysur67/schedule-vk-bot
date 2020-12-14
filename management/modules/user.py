@@ -151,7 +151,7 @@ class User:
             self.api.send_message_keyboard(
                 user_id = self.user_id,
                 message = 'Я вас не понимаю\nПожалуйста, пользуйтесь кнопками\n'+
-                    'Что бы продолжить нажмите "Начать"',
+                    'Чтобы продолжить, нажмите "Начать"',
                 keyboard = keyboard_.get_keyboard(),
             )
 
