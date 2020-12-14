@@ -28,20 +28,36 @@ class API:
     #         )
 
     def send_message(self, message, user_id):
-        self.vk.messages.send(
-            user_id=int(user_id),
-            random_id=get_random_id(),
-            peer_id = int(user_id),
-            message=message
+        try:
+            self.vk.messages.send(
+                user_id=int(user_id),
+                random_id=get_random_id(),
+                peer_id = int(user_id),
+                message=message
+                )
+        except Exception:
+            self.vk.messages.send(
+                user_id = int(self.admins[0]),
+                random_id=get_random_id(),
+                peer_id = int(self.admins[0]),
+                message="*(" + str(user_id) + ") не включил сообщения от сообщества!" 
             )
     
     def send_message_keyboard(self, message, user_id, keyboard):
-        self.vk.messages.send(
-            user_id=int(user_id),
-            random_id=get_random_id(),
-            peer_id = int(user_id),
-            message=message,
-            keyboard= keyboard.get_keyboard(),
+        try:
+            self.vk.messages.send(
+                user_id=int(user_id),
+                random_id=get_random_id(),
+                peer_id = int(user_id),
+                message=message,
+                keyboard= keyboard.get_keyboard(),
+                )
+        except Exception:
+            self.vk.messages.send(
+                user_id = int(self.admins[0]),
+                random_id=get_random_id(),
+                peer_id = int(self.admins[0]),
+                message="*(" + str(user_id) + ") не включил сообщения от сообщества!" 
             )
 
     def is_new_message(self, event):
