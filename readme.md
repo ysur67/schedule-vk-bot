@@ -8,10 +8,10 @@ And, simply, I don't know how to use OOP properly and in Python, even more so
 ### There is no "How to install" part
 Actually, I don't even know is it really needed. Anyway, somehow and someday I will add it, but I don't know when
 ### That's how places from where bot takes info look like
-The site from where timetable's files are taken
+The site from which timetable files are taken
 <img src="https://github.com/ysur67/schedule-vk-bot/blob/main/management/video/1.png" />
 
-That's how timetable's files look
+That's how timetable files look
 <img src="https://github.com/ysur67/schedule-vk-bot/blob/main/management/video/2.png" />
 
 # How bot works for now<br/>
